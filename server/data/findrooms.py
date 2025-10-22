@@ -7,36 +7,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from bs4 import BeautifulSoup 
 #Time for timer at the end before closing
 import time
-
-#mongodb for storing data in database
-from pymongo.mongo_client import MongoClient
-import certifi
-
-#Retrieve data from .env file
-import os
-
+#sqlite for storing data in database
+import sqlite3
 #Datetime for converting time to 24 hour format
 import datetime
-
-
-#dotenv for monbodb uri
-from dotenv import load_dotenv
-
-load_dotenv()
-uri = os.getenv("MONGODB_URI")
-print(uri)
-
-
-
-# Create a new client and connect to the server
-client = MongoClient(uri, tlsCAFile=certifi.where())
-
-# Send a ping to confirm a successful connection
-try:
-    client.admin.command('ping')
-    print("Pinged your deployment. You successfully connected to MongoDB!")
-except Exception as e:
-    print(e)
+import os
  
 
 driver = webdriver.Chrome() 
@@ -122,22 +97,9 @@ for school in range(26):
                     print(roomInfo)
 
 
-      
-    
-
-            
-
-
-
-
-
-
-
-
-
-
-
     except Exception as e:
+        print(f"school: {school}")
+        printf(f"")
         print(f"Error interacting with div: {e}")
 
 
