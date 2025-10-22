@@ -99,7 +99,6 @@ for school in range(26):
 
     except Exception as e:
         print(f"school: {school}")
-        printf(f"")
         print(f"Error interacting with div: {e}")
 
 
