@@ -85,15 +85,16 @@ function saveToDB(rooms){
     CREATE TABLE Schedule (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       building  TEXT NOT NULL,
-      roomNumber TEXT NOT NULL,
+      room_number TEXT NOT NULL,
       start_time TEXT NOT NULL,
       end_time   TEXT NOT NULL,
       day        TEXT NOT NULL
+    );
   `);
 
     const insert = db.prepare(`
-    INSERT OR IGNORE INTO Schedule (room, start_time, end_time, day)
-    VALUES (@room, @start_time, @end_time, @day)
+    INSERT OR IGNORE INTO Schedule (building, room_number, start_time, end_time, day)
+    VALUES (@building, @roomNumber, @start_time, @end_time, @day)
     `);
 
     const insertRooms = db.transaction((rooms) =>{
@@ -108,8 +109,7 @@ function saveToDB(rooms){
         }
     });
 
-    const result = insertRooms(rooms);
-    console.log(`Inserted ${result.changes} records into the database.`);
+    insertRooms(rooms);
     console.log(`Inserted ${rooms.length} records into the database.`);
     db.close();
 }
