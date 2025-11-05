@@ -138,3 +138,8 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+
+#-wal and -shm files created by SQLite
+*.db-wal
+*.db-shm

@@ -1,16 +1,16 @@
 const db = require('../db/connection');
 
 // Function to get schedule for a specific room and day using Promises
-function getScheduleForRoomAndDay(room, day) {
+function getScheduleForRoomAndDay(building, roomNumber, day) {
     return new Promise((resolve, reject) => {
         const query = `
             SELECT DISTINCT start_time, end_time
             FROM Schedule
-            WHERE room = ? AND day = ?
+            WHERE building = ? AND room_number = ? AND day = ?
             ORDER BY start_time;
         `;
 
-        db.all(query, [room, day], (err, rows) => {
+        db.all(query, [building, roomNumber, day], (err, rows) => {
             if (err) {
                 return reject(err);
             }
@@ -21,15 +21,15 @@ function getScheduleForRoomAndDay(room, day) {
 
 // Controller to get all bookings for a specific room and day
 exports.getRoomBookingsByDay = async (req, res) => {
-    const { room, day } = req.query; // Extract room and day from query parameters
+    const { building, roomNumber, day } = req.query; // Extract building, roomNumber, and day from query parameters
 
-    if (!room || !day) {
-        return res.status(400).json({ error: 'Room and day are required' });
+    if (!building || !roomNumber || !day) {
+        return res.status(400).json({ error: 'Building, room number, and day are required' });
     }
 
     try {
         // Use the helper function to fetch data
-        const schedule = await getScheduleForRoomAndDay(room, day);
+        const schedule = await getScheduleForRoomAndDay(building, roomNumber, day);
         res.json(schedule);
     } catch (err) {
         console.error('Error querying database:', err);
