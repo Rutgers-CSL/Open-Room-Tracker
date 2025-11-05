@@ -76,6 +76,9 @@ function extractRooms(data) {
     return rooms;
 }
 
+
+
+//Saves extracted rooms into SQLite Database
 function saveToDB(rooms){
     const db = new Database('rooms.db');
     db.pragma('journal_mode = WAL');
@@ -88,7 +91,8 @@ function saveToDB(rooms){
       room_number TEXT NOT NULL,
       start_time TEXT NOT NULL,
       end_time   TEXT NOT NULL,
-      day        TEXT NOT NULL
+      day        TEXT NOT NULL,
+      UNIQUE(building, room_number, start_time, end_time, day)
     );
   `);
 
@@ -99,6 +103,7 @@ function saveToDB(rooms){
 
     const insertRooms = db.transaction((rooms) =>{
         for (const room of rooms){
+          try {
             insert.run({
                 building: room.building,
                 roomNumber: room.roomNumber,
@@ -106,6 +111,9 @@ function saveToDB(rooms){
                 end_time: room.endTime,
                 day: room.day
             });
+          } catch (error) {
+            console.error(`Failed to insert ${room.building} ${room.roomNumber} (${room.day} ${room.startTime}-${room.endTime}): ${error.message}`);
+          }
         }
     });
 
@@ -116,140 +124,14 @@ function saveToDB(rooms){
 
 
 
-
-
-data = [
-  {
-    "subject": "013",
-    "title": "BIBLE IN ARAMAIC",
-    "courseString": "01:013:111",
-    "school": {
-      "code": "01",
-      "description": "School of Arts and Sciences"
-    },
-    "level": "U",
-    "campusCode": "NB",
-    "sections": [
-      {
-        "number": "01",
-        "instructorsText": "HABERL, CHARLES",
-        "meetingTimes": [
-          {
-            "campusLocation": "1",
-            "roomNumber": "2100",
-            "buildingCode": "ABW",
-            "meetingDay": "H",
-            "startTimeMilitary": "1400",
-            "endTimeMilitary": "1520",
-            "meetingModeCode": "02"
-          },
-          {
-            "campusLocation": "O",
-            "roomNumber": "",
-            "buildingCode": "",
-            "meetingDay": "",
-            "startTimeMilitary": "",
-            "endTimeMilitary": "",
-            "meetingModeCode": "90"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "subject": "013",
-    "title": "ELEMENTARY ARABIC I",
-    "courseString": "01:013:140",
-    "school": {
-      "code": "01",
-      "description": "School of Arts and Sciences"
-    },
-    "level": "U",
-    "campusCode": "NB",
-    "sections": [
-      {
-        "number": "01",
-        "instructorsText": "ALI, JAMAL",
-        "meetingTimes": [
-          {
-            "campusLocation": "1",
-            "roomNumber": "A6",
-            "buildingCode": "HH",
-            "meetingDay": "M",
-            "startTimeMilitary": "1400",
-            "endTimeMilitary": "1520",
-            "meetingModeCode": "02"
-          },
-          {
-            "campusLocation": "1",
-            "roomNumber": "A6",
-            "buildingCode": "HH",
-            "meetingDay": "W",
-            "startTimeMilitary": "1400",
-            "endTimeMilitary": "1520",
-            "meetingModeCode": "02"
-          }
-        ]
-      },
-      {
-        "number": "02",
-        "instructorsText": "ALI, JAMAL",
-        "meetingTimes": [
-          {
-            "campusLocation": "1",
-            "roomNumber": "3100",
-            "buildingCode": "ABW",
-            "meetingDay": "M",
-            "startTimeMilitary": "1550",
-            "endTimeMilitary": "1710",
-            "meetingModeCode": "02"
-          },
-          {
-            "campusLocation": "1",
-            "roomNumber": "3100",
-            "buildingCode": "ABW",
-            "meetingDay": "W",
-            "startTimeMilitary": "1550",
-            "endTimeMilitary": "1710",
-            "meetingModeCode": "02"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "subject": "620",
-    "title": "NEGOTIATIONS",
-    "courseString": "22:620:617",
-    "school": {
-      "code": "22",
-      "description": "Rutgers Business School - Newark/New Brunswick (Graduate)"
-    },
-    "level": "G",
-    "campusCode": "OB",
-    "sections": [
-      {
-        "number": "60",
-        "instructorsText": "KURTZBERG",
-        "meetingTimes": [
-          {
-            "campusLocation": "Z",
-            "roomNumber": "122",
-            "buildingCode": "1CP",
-            "meetingDay": "W",
-            "startTimeMilitary": "1800",
-            "endTimeMilitary": "2100",
-            "meetingModeCode": "02"
-          }
-        ]
-      }
-    ]
-  }
-]
-
-const rooms = extractRooms(data);
-console.log(rooms);
-saveToDB(rooms);
+//Main workflow
+fetchJson().then(data =>{
+    const rooms = extractRooms(data);
+    saveToDB(rooms);
+})
+.catch(error =>{
+    console.error('Error fetching or processing data:', error);
+})
 
 
 

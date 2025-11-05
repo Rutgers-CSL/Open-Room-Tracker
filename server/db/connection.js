@@ -1,7 +1,7 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-const dbPath = path.resolve(__dirname, '../data/class_schedule.db');
+const dbPath = path.resolve(__dirname, '../data/rooms.db');
 
 const db = new sqlite3.Database(dbPath, (err) => {
   if (err) {

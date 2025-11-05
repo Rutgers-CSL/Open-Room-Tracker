@@ -4,7 +4,7 @@ const db = require('../db/connection');
 function getScheduleForUniqueRooms() {
     return new Promise((resolve, reject) => {
         const query = `
-            SELECT DISTINCT room
+            SELECT DISTINCT building
             FROM Schedule
         `;
 
@@ -18,14 +18,14 @@ function getScheduleForUniqueRooms() {
 }
 
 // Controller to get all bookings for a specific room and day
-exports.getUniqueRooms = async (req, res) => {
+exports.getUniqueBuildings = async (req, res) => {
 
     try {
         // Use the helper function to fetch data
         const schedule = await getScheduleForUniqueRooms();
         rooms = []
         for(i = 0; i < schedule.length; i++){
-            rooms.push(schedule[i].room.split("-")[0])
+            rooms.push(schedule[i].building)
         }
         rooms = [...new Set(rooms)]
         rooms.sort()
