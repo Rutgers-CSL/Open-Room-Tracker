@@ -18,9 +18,4 @@ describe('API smoke tests', () => {
     expect(Array.isArray(res.body)).toBe(true);
   });
 
-
-
-//   test('GET /api/add adds a building (skipped for now)', async () => {
-//   });
-
 });
