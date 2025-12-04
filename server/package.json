@@ -7,7 +7,6 @@
     "test": "NODE_ENV=test vitest run",
     "test:watch": "NODE_ENV=test vitest"
   },
-  
   "keywords": [],
   "author": "",
   "license": "ISC",
