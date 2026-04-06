@@ -56,24 +56,12 @@ function extractEvents(rssData) {
 
 //save events into SQLite db
 function saveToDB(events) {
-    const db = new Database('events.db');
+    const db = new Database('server/data/rooms.db');
     db.pragma('journal_mode = WAL');
 
-    db.exec(`
-        DROP TABLE IF EXISTS Events;
-        CREATE TABLE Events (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            title TEXT NOT NULL,
-            organization TEXT,
-            location TEXT,
-            start_datetime TEXT,
-            end_datetime TEXT
-        );
-    `);
-
     const insert = db.prepare(`
-        INSERT INTO Events (title, organization, location, start_datetime, end_datetime)
-        VALUES (@title, @organization, @location, @startDateTime, @endDateTime)
+        INSERT INTO Schedule (title, organization, location, date)
+        VALUES (@title, @organization, @location, @startDateTime)
     `);
 
     const insertEvents = db.transaction(events => {
@@ -83,7 +71,7 @@ function saveToDB(events) {
     });
 
     insertEvents(events);
-    console.log(`Inserted ${events.length} events into database.`);
+    console.log(`Inserted ${events.length} events into Schedule table.`);
     db.close();
 }
 
