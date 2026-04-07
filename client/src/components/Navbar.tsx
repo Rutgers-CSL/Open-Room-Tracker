@@ -1,17 +1,17 @@
 import { Link } from 'react-router-dom'
 import Logo from 'components/Logo'
+import './Navbar.css'
 
 const Navbar = () => {
   return (
-    <nav className="flex items-center justify-between border-b px-6 py-4">
-      <Link to="/welcome" className="inline-flex items-center">
+    <nav className="site-navbar">
+      <Link to="/welcome" className="site-navbar-logo-link">
         <Logo />
       </Link>
 
-      <div className="flex gap-4 text-sm">
-        <Link to="/welcome">Welcome</Link>
-        <Link to="/search">Search</Link>
-        <Link to="/calendar">Calendar</Link>
+      <div className="site-navbar-links">
+        <Link to="/welcome">Home</Link>
+        <a href="#about">About Us</a>
       </div>
     </nav>
   )
