@@ -20,6 +20,7 @@ const SearchPage = () => {
   const [roomNumber, setRoomNumber] = useState('')
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs())
   const [buildingMap, setBuildingMap] = useState<BuildingMapItem[]>([])
+  const [showBuildingSuggestions, setShowBuildingSuggestions] = useState(false)
 
   const calendarTheme = createTheme({
     palette: {
@@ -119,9 +120,16 @@ const SearchPage = () => {
                   type="text"
                   placeholder="Search"
                   value={building}
-                  onChange={(event) => setBuilding(event.target.value)}
+                  onChange={(event) => {
+                    setBuilding(event.target.value)
+                    setShowBuildingSuggestions(true)
+                  }}
+                  onFocus={() => setShowBuildingSuggestions(true)}
+                  onBlur={() => {
+                    setTimeout(() => setShowBuildingSuggestions(false), 120)
+                  }}
                 />
-                {building.trim() && (
+                {building.trim() && showBuildingSuggestions && (
                   <ul className="building-suggestions-dropdown">
                     {buildingSuggestions.length > 0 ? (
                       buildingSuggestions.map((item: BuildingMapItem) => (
@@ -129,7 +137,10 @@ const SearchPage = () => {
                           <button
                             type="button"
                             className="building-suggestion-option"
-                            onClick={() => setBuilding(item.name)}
+                            onClick={() => {
+                              setBuilding(item.name)
+                              setShowBuildingSuggestions(false)
+                            }}
                           >
                             <span>{item.name}</span>
                             <span>{item.abbr}</span>
