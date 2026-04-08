@@ -1,4 +1,5 @@
 const Database = require('better-sqlite3');
+const path = require('path');
 
 
 async function fetchBuildings() {
@@ -36,8 +37,8 @@ function extractMappings(data) {
 
 // Save the mappings into the SQLite database
 function saveToDB(mappings) {
-    // Connect to the database (adjust path if running from a different directory)
-    const db = new Database('rooms.db');
+    const dbPath = path.resolve(__dirname, 'rooms.db');
+    const db = new Database(dbPath);
     db.pragma('journal_mode = WAL');
 
     // Create the table and clear it if it already exists so we don't get duplicates
