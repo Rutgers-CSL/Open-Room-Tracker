@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&display=swap');
+
+.site-navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2.5rem 4.25rem 1.5rem;
+}
+
+.site-navbar-logo-link {
+  text-decoration: none;
+}
+
+.site-navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 2.75rem;
+}
+
+.site-navbar-links a {
+  font-family: 'Gloria Hallelujah', cursive;
+  color: #c00f0c;
+  text-decoration: none;
+  font-size: 2rem;
+  line-height: 1;
+}

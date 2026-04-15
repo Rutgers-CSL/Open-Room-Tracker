@@ -1,0 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Gloria+Hallelujah&display=swap');
+
+.welcome-page {
+  min-height: 100vh;
+  background-color: #27272a;
+  font-family: 'Gloria Hallelujah', cursive;
+}
+
+.welcome-content {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2.25rem;
+}
+
+.welcome-logo-text {
+  margin: 0;
+  font-size: 4rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.02em;
+}
+
+.welcome-logo-ru {
+  color: #c00f0c;
+}
+
+.welcome-logo-open {
+  color: #e0dbd1;
+}
+
+.welcome-search-button {
+  border: 2px solid #e0dbd1;
+  border-radius: 10px;
+  color: #e0dbd1;
+  text-decoration: none;
+  font-size: 2rem;
+  line-height: 1;
+  padding: 1rem 2.75rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.welcome-search-button:hover {
+  background-color: #e0dbd1;
+  color: #27272a;
+}
