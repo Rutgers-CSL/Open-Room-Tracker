@@ -36,3 +36,41 @@ exports.getRoomBookingsByDay = async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+// Function to get unique room numbers for a specific building using Promises
+function getRoomNumbersForBuilding(building) {
+    return new Promise((resolve, reject) => {
+        const query = `
+            SELECT DISTINCT room_number
+            FROM Schedule
+            WHERE building = ?
+            ORDER BY room_number;
+        `;
+
+        db.all(query, [building], (err, rows) => {
+            if (err) {
+                return reject(err);
+            }
+            resolve(rows);
+        });
+    });
+}
+
+// Controller to get all unique room numbers for a specific building
+exports.getRoomNumbers = async (req, res) => {
+    const { building } = req.query; 
+
+    if (!building) {
+        return res.status(400).json({ error: 'Building code is required' });
+    }
+
+    try {
+        const roomsData = await getRoomNumbersForBuilding(building);
+        // Map the rows to extract just the room numbers into a simple array
+        const rooms = roomsData.map(row => row.room_number);
+        res.json(rooms);
+    } catch (err) {
+        console.error('Error querying database:', err);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

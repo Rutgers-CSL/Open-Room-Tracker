@@ -20,7 +20,11 @@ const SearchPage = () => {
   const [roomNumber, setRoomNumber] = useState('')
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs())
   const [buildingMap, setBuildingMap] = useState<BuildingMapItem[]>([])
+
   const [showBuildingSuggestions, setShowBuildingSuggestions] = useState(false)
+
+  const [availableRooms, setAvailableRooms] = useState<string[]>([])
+  const [showRoomSuggestions, setShowRoomSuggestions] = useState(false)
 
   const calendarTheme = createTheme({
     palette: {
@@ -58,25 +62,64 @@ const SearchPage = () => {
       .map((result: { item: BuildingMapItem }) => result.item)
   }, [building, fuse])
 
-  const handleSearch = () => {
-    if (!building.trim() || !roomNumber.trim()) {
-      return
-    }
-
+  const activeBuildingAbbr = useMemo(() => {
     const buildingQuery = building.trim()
+    if (!buildingQuery) return ''
+
     const exactAbbreviation = buildingMap.find(
       (item) => item.abbr.toLowerCase() === buildingQuery.toLowerCase()
     )
     const bestMatch =
       buildingSuggestions.length > 0 ? buildingSuggestions[0] : null
-    const buildingAbbreviation = bestMatch
+
+    return bestMatch
       ? bestMatch.abbr
       : exactAbbreviation
         ? exactAbbreviation.abbr
         : buildingQuery.toUpperCase()
+  }, [building, buildingMap, buildingSuggestions])
+
+  useEffect(() => {
+    if (!activeBuildingAbbr) {
+      setAvailableRooms([])
+      return
+    }
+
+    const fetchRooms = async () => {
+      try {
+        const response = await fetch(`
+          http://localhost:3000/api/rooms?building=${activeBuildingAbbr}`)
+        if (response.ok) {
+          const data: string[] = await response.json()
+          setAvailableRooms(data)
+
+          setRoomNumber((prevRoom) => (data.includes(prevRoom) ? prevRoom : ''))
+        }
+      } catch (error) {
+        console.error('Failed to fetch rooms', error)
+        setAvailableRooms([])
+      }
+    }
+
+    const timeoutId = setTimeout(() => {
+      void fetchRooms()
+    }, 300)
+
+    return () => clearTimeout(timeoutId)
+  }, [activeBuildingAbbr])
+
+  const filteredRooms = useMemo(() => {
+    if (!roomNumber) return availableRooms
+    return availableRooms.filter((room) => room.startsWith(roomNumber))
+  }, [roomNumber, availableRooms])
+
+  const handleSearch = () => {
+    if (!building.trim() || !roomNumber.trim()) {
+      return
+    }
 
     const params = new URLSearchParams({
-      building: buildingAbbreviation,
+      building: activeBuildingAbbr,
       roomNumber: roomNumber.trim(),
       day: selectedDate.format('dddd'),
       date: selectedDate.format('YYYY-MM-DD')
@@ -162,14 +205,53 @@ const SearchPage = () => {
               </div>
             </label>
 
+            {/* Room Dropdown (Searchable/Autocomplete) */}
             <label className="search-field">
               <span>Room # :</span>
-              <input
-                type="text"
-                placeholder="Value"
-                value={roomNumber}
-                onChange={(event) => setRoomNumber(event.target.value)}
-              />
+              <div className="search-building-input-wrap">
+                <input
+                  type="text"
+                  placeholder="Value"
+                  value={roomNumber}
+                  onChange={(event) => {
+                    setRoomNumber(event.target.value)
+                    setShowRoomSuggestions(true)
+                  }}
+                  onFocus={() => setShowRoomSuggestions(true)}
+                  onBlur={() => {
+                    // Delay to allow click events on the dropdown to register
+                    setTimeout(() => setShowRoomSuggestions(false), 120)
+                  }}
+                />
+
+                {showRoomSuggestions && availableRooms.length > 0 && (
+                  <ul
+                    className="building-suggestions-dropdown"
+                    style={{ width: '100%', minWidth: '100%' }}
+                  >
+                    {filteredRooms.length > 0 ? (
+                      filteredRooms.map((room) => (
+                        <li key={room}>
+                          <button
+                            type="button"
+                            className="building-suggestion-option"
+                            onClick={() => {
+                              setRoomNumber(room)
+                              setShowRoomSuggestions(false)
+                            }}
+                          >
+                            <span>{room}</span>
+                          </button>
+                        </li>
+                      ))
+                    ) : (
+                      <li className="building-suggestion-empty">
+                        No matches found
+                      </li>
+                    )}
+                  </ul>
+                )}
+              </div>
             </label>
           </div>
 
