@@ -2,6 +2,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import sqlite3
+import re
+import os
 
 website = 'https://dcs.rutgers.edu/classrooms/find-a-classroom/table-mode' #DCS website
 path = '/Users/martinshen/Documents/cs/CSL/scarletLabs/openClassroomTracker/src/webscrape/chromedriver'  
@@ -16,6 +19,7 @@ location_code = []
 campus = []
 building = []
 titles = []
+
 
 #gets all the rows in the table / info is not cleaned
 matches = driver.find_elements(By.TAG_NAME, 'tr')
@@ -36,5 +40,34 @@ for match in matches:
         campus.append(cells[3].text)
     if len(cells) >= 5:  # make sure there's a 5th column
         building.append(cells[4].text)
-print(titles)
-#next up is to store in sql database
+
+prefixes = [re.match(r'^([^-\s]+)', code).group(1) for code in location_code]
+
+
+data_dict = {}
+for i in range(len(prefixes)):
+    data_dict[prefixes[i]] = building[i]
+print(data_dict)
+
+script_dir = os.path.dirname(os.path.abspath(__file__))
+db_path = os.path.join(script_dir, 'class_schedule.db')
+connection = sqlite3.connect(db_path)
+cursor = connection.cursor()
+# Create table for classroom locations
+cursor.execute("""
+    CREATE TABLE IF NOT EXISTS RoomNames (
+        code TEXT PRIMARY KEY,
+        name TEXT NOT NULL
+)
+""")
+#enter data into table
+for code, name in data_dict.items():
+    cursor.execute(
+        "INSERT OR REPLACE INTO RoomNames (code, name) VALUES (?, ?)",
+        (code, name)
+    )
+
+connection.commit()
+connection.close()
+
+print("RoomNames table updated successfully!")
